@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 import os
 import time
 from test1 import test
-# 设置多线程和随机种子以保证结果的可复现性
+# 设置多线程和随机种子以保证结果的可复现性  你好
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 # OMP_NUM_THREADS = 8
