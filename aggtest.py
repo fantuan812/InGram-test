@@ -16,7 +16,7 @@ from my_parser import parse
 import os
 # 设置多线程和随机种子以保证结果的可复现性
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 # OMP_NUM_THREADS = 8
 seed = 0
 torch.manual_seed(seed)
@@ -210,6 +210,11 @@ class Client:
         if mrr>self.mrr:
             print("bestepoch")
             self.mrr=mrr
+            file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
+                    f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \
+                    f"_neg_{self.args.num_neg}_layer_{self.args.num_layer_ent}_{self.args.num_layer_rel}" + \
+                    f"_hid_{self.args.hidden_dimension_ratio_entity}_{self.args.hidden_dimension_ratio_relation}" + \
+                    f"_head_{self.args.num_head}_margin_{self.args.margin}"
             # 如果允许写入，保存模型状态
             if not self.args.no_write:
                 torch.save({'model_state_dict': self.model.state_dict(), \
