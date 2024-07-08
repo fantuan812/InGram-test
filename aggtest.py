@@ -129,9 +129,9 @@ class Client:
 
         # 设置优化器
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr = self.args.learning_rate)
-        print("self.data_num:",self.data_num)
-        print(self.data_num)
-        print(self.data_num == 2)
+        # print("self.data_num:",self.data_num)
+        # print(self.data_num)
+        # print(self.data_num == 2)
         # if(int(self.data_num) == 2):
         #     pbar= tqdm(range(self.valid_epochs*2))
         # else:
@@ -216,7 +216,7 @@ class Client:
                             'optimizer_state_dict': self.optimizer.state_dict(), \
                             'inf_emb_ent': val_init_emb_ent, \
                             'inf_emb_rel': val_init_emb_rel}, \
-                    f"ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}/best.ckpt")
+                    f"ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}/{file_format}.ckpt")
     def savebest(self):
         file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
                     f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \

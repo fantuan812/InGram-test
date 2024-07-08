@@ -9,15 +9,23 @@ from utils import get_rank, get_metrics
 from my_parser import parse
 from evaluation import evaluatemulti
 import os
+# 设置多线程和随机种子以保证结果的可复现性
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-OMP_NUM_THREADS=8
-torch.manual_seed(0)
-random.seed(0)
-np.random.seed(0)
+# OMP_NUM_THREADS = 8
+seed = 0
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
+np.random.seed(seed) # Numpy module.
+random.seed(seed) # Python random module.
+torch.manual_seed(seed)
+torch.backends.cudnn.benchmark = False # 禁用benchmark，保证可复现
+torch.backends.cudnn.deterministic = True
+# 设置PyTorch的一些环境参数，以优化运算和调试
 torch.autograd.set_detect_anomaly(True)
-torch.backends.cudnn.benchmark = True
-torch.set_num_threads(8)
+os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+torch.use_deterministic_algorithms(True)
 torch.cuda.empty_cache()
 
 args = parse(test=True)
@@ -56,7 +64,7 @@ for i in range(num):
 
     if not args.single:
         if not args.best:
-            my_model.load_state_dict(torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/best.ckpt")["model_state_dict"])
+            my_model.load_state_dict(torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/{file_format}.ckpt")["model_state_dict"])
         else : 
             my_model.load_state_dict(torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/{file_format}_best.ckpt")["model_state_dict"])
     else :
