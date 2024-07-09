@@ -113,6 +113,11 @@ class Client:
         #     self.valid_epochs = self.args.validation_epoch
         self.valid_epochs = self.args.validation_epoch
         self.num_neg = self.args.num_neg
+        self.file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
+                    f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \
+                    f"_neg_{self.args.num_neg}_layer_{self.args.num_layer_ent}_{self.args.num_layer_rel}" + \
+                    f"_hid_{self.args.hidden_dimension_ratio_entity}_{self.args.hidden_dimension_ratio_relation}" + \
+                    f"_head_{self.args.num_head}_margin_{self.args.margin}"
         self.model = InGram(dim_ent = self.d_e, hid_dim_ratio_ent = self.hdr_e, dim_rel = self.d_r, hid_dim_ratio_rel = self.hdr_r, \
                         num_bin = self.B,num_ent=self.num_ent,num_rel=self.num_rel, num_layer_ent = self.args.num_layer_ent, num_layer_rel = self.args.num_layer_rel, \
                         num_head = self.args.num_head)
@@ -177,12 +182,7 @@ class Client:
         # 如果不禁用写入，设置检查点保存路径
         if not self.args.no_write:
             os.makedirs(f"./ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}", exist_ok=True)
-        # 格式化文件名以包含训练参数
-        file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
-                    f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \
-                    f"_neg_{self.args.num_neg}_layer_{self.args.num_layer_ent}_{self.args.num_layer_rel}" + \
-                    f"_hid_{self.args.hidden_dimension_ratio_entity}_{self.args.hidden_dimension_ratio_relation}" + \
-                    f"_head_{self.args.num_head}_margin_{self.args.margin}"
+        
         val_init_emb_ent, val_init_emb_rel, val_relation_triplets = initialize(self.valid, self.valid.msg_triplets, \
                                                                                 self.d_e, self.d_r, self.B)
         print(self.args.data_name)
@@ -195,12 +195,6 @@ class Client:
         # 如果不禁用写入，设置检查点保存路径
         if not self.args.no_write:
             os.makedirs(f"./ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}", exist_ok=True)
-        # 格式化文件名以包含训练参数
-        file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
-                    f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \
-                    f"_neg_{self.args.num_neg}_layer_{self.args.num_layer_ent}_{self.args.num_layer_rel}" + \
-                    f"_hid_{self.args.hidden_dimension_ratio_entity}_{self.args.hidden_dimension_ratio_relation}" + \
-                    f"_head_{self.args.num_head}_margin_{self.args.margin}"
         val_init_emb_ent, val_init_emb_rel, val_relation_triplets = initialize(self.valid, self.valid.msg_triplets, \
                                                                                 self.d_e, self.d_r, self.B)
         print(self.args.data_name)
@@ -212,24 +206,15 @@ class Client:
         if mrr>self.mrr:
             print("bestepoch")
             self.mrr=mrr
-            file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
-                    f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \
-                    f"_neg_{self.args.num_neg}_layer_{self.args.num_layer_ent}_{self.args.num_layer_rel}" + \
-                    f"_hid_{self.args.hidden_dimension_ratio_entity}_{self.args.hidden_dimension_ratio_relation}" + \
-                    f"_head_{self.args.num_head}_margin_{self.args.margin}"
             # 如果允许写入，保存模型状态
             if not self.args.no_write:
                 torch.save({'model_state_dict': self.model.state_dict(), \
                             'optimizer_state_dict': self.optimizer.state_dict(), \
                             'inf_emb_ent': val_init_emb_ent, \
                             'inf_emb_rel': val_init_emb_rel}, \
-                    f"ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}/{file_format}.ckpt")
+                    f"ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}/{self.file_format}.ckpt")
     def savebest(self):
-        file_format = f"lr_{self.args.learning_rate}_dim_{self.args.dimension_entity}_{self.args.dimension_relation}" + \
-                    f"_bin_{self.args.num_bin}_total_{self.args.num_epoch}_every_{self.args.validation_epoch}" + \
-                    f"_neg_{self.args.num_neg}_layer_{self.args.num_layer_ent}_{self.args.num_layer_rel}" + \
-                    f"_hid_{self.args.hidden_dimension_ratio_entity}_{self.args.hidden_dimension_ratio_relation}" + \
-                    f"_head_{self.args.num_head}_margin_{self.args.margin}"
+        
         val_init_emb_ent, val_init_emb_rel, val_relation_triplets = initialize(self.valid, self.valid.msg_triplets, \
                                                                                 self.d_e, self.d_r, self.B)
         # 如果允许写入，保存模型状态
@@ -238,7 +223,7 @@ class Client:
                         'optimizer_state_dict': self.optimizer.state_dict(), \
                         'inf_emb_ent': val_init_emb_ent, \
                         'inf_emb_rel': val_init_emb_rel}, \
-                f"ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}/{file_format}_best.ckpt")
+                f"ckpt/{self.args.exp}/{self.args.data_name}/{self.data_num}/{self.file_format}_best.ckpt")
     def get_relation_weights(self):
         # 提供关系层权重
         return self.relation_weights
