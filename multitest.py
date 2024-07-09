@@ -83,7 +83,7 @@ for i in range(num):
     test_relation_triplets = generate_relation_triplets(test_msg, test.num_ent, test.num_rel, B)
     if not args.single:
         if not args.best:
-            test_init_emb_ent = torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/{file_format}best.ckpt")["inf_emb_ent"]
+            test_init_emb_ent = torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/{file_format}.ckpt")["inf_emb_ent"]
             test_init_emb_rel = torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/{file_format}.ckpt")["inf_emb_rel"]
         else:
             test_init_emb_ent = torch.load(f"ckpt/{args.exp}/{args.data_name}/{str(i) }/{file_format}_best.ckpt")["inf_emb_ent"]
