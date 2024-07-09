@@ -97,7 +97,7 @@ for i in range(args.client_num):
 		sup = torch.tensor(sup).cuda()
 
 		# 前向传播
-		emb_ent, emb_rel = my_model(init_emb_ent, init_emb_rel, msg, relation_triplets)
+		emb_ent, emb_rel = my_model( msg, relation_triplets)
 		pos_scores = my_model.score(emb_ent, emb_rel, msg)
 		neg_scores = my_model.score(emb_ent, emb_rel, generate_neg(msg, train.num_ent, num_neg = num_neg)) #  generate_neg生成负例三元组
 
