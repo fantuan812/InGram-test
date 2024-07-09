@@ -264,7 +264,7 @@ class InGram(nn.Module):
                 nn.init.zeros_(self.res_proj_rel[layer_idx].bias)
             
 
-    def forward(self, emb_ent, emb_rel, triplets, relation_triplets):
+    def forward(self, triplets, relation_triplets):
         # 通过初始投影层传递输入嵌入
         # layer_emb_ent = self.ent_proj1(self.init_emb_ent)
         # layer_emb_rel = self.rel_proj1(self.init_emb_rel)

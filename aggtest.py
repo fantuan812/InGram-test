@@ -73,12 +73,12 @@ class Server:
                 ]), dim=0)
                 averaged_weights = torch.div(accumulated_weights, rel_size).clone()
                 self.relation_layer_weights[name] = averaged_weights
-            # else :
-            #     # accumulated_weights = torch.sum(torch.stack([
-            #     #     torch.mul(client.relation_weights[name], client.num_ent) for client in clients
-            #     # ]), dim=0)
-            #     # averaged_weights = torch.div(accumulated_weights, ent_size).clone()
-            #     # self.relation_layer_weights[name] = averaged_weights
+            elif "layers_ent" in name :
+                accumulated_weights = torch.sum(torch.stack([
+                    torch.mul(client.relation_weights[name], client.num_ent) for client in clients
+                ]), dim=0)
+                averaged_weights = torch.div(accumulated_weights, ent_size).clone()
+                self.relation_layer_weights[name] = averaged_weights
             #     averaged_weights=torch.mean(torch.stack([cw[name] for cw in collected_weights]), dim=0)
             #     self.relation_layer_weights[name] = averaged_weights
     def distribute_weights(self, clients):
@@ -139,20 +139,22 @@ class Client:
         pbar = tqdm(range(self.valid_epochs))
         print(pbar)
         total_loss = 0
+        msg, sup = self.train.split_transductive(1) # 随机分割数据 msg训练数据 
+        # 初始化实体和关系的嵌入向量
+        init_emb_ent, init_emb_rel, relation_triplets = initialize(self.train,msg, self.d_e, self.d_r, self.B)
+        msg = torch.tensor(msg).cuda()
+        sup = torch.tensor(sup).cuda()
 
         # 训练循环
         for epoch in pbar:
             self.optimizer.zero_grad()
-            msg, sup = self.train.split_transductive(1) # 随机分割数据 msg训练数据 
-
-            # 初始化实体和关系的嵌入向量
-            init_emb_ent, init_emb_rel, relation_triplets = initialize(self.train,msg, self.d_e, self.d_r, self.B)
-            msg = torch.tensor(msg).cuda()
-            sup = torch.tensor(sup).cuda()
+            
 
             # 前向传播
-            emb_ent, emb_rel = self.model(init_emb_ent, init_emb_rel, msg, relation_triplets)
+            emb_ent, emb_rel = self.model(msg, relation_triplets)
             pos_scores = self.model.score(emb_ent, emb_rel, msg)
+            # neg_triplets = generate_neg(msg, self.train.num_ent, num_neg=self.num_neg).cuda()
+            # neg_scores = self.model.score(emb_ent, emb_rel, neg_triplets)
             neg_scores = self.model.score(emb_ent, emb_rel, generate_neg(msg, self.train.num_ent, num_neg = self.num_neg)) #  generate_neg生成负例三元组
 
             # 计算损失并反向传播

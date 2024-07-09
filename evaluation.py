@@ -94,7 +94,7 @@ def evaluatemulti(my_model, target, epoch, init_emb_ent, init_emb_rel, relation_
         msg = torch.tensor(target.msg_triplets).cuda()
         sup = torch.tensor(target.sup_triplets).cuda()
 
-        emb_ent, emb_rel = my_model(init_emb_ent, init_emb_rel, msg, relation_triplets)
+        emb_ent, emb_rel = my_model( msg, relation_triplets)
 
         head_ranks = []
         tail_ranks = []
