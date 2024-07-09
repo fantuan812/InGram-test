@@ -27,7 +27,7 @@ python multitest.py --data_name [dataset_name] -d_e [dimension_entity] -d_r [dim
 ```
 the federated results
 ```python
-python multitest.py --data_name [dataset_name] -d_e [dimension_entity] -d_r [dimension_relation] --single --best
+python multitest.py --data_name [dataset_name] -d_e [dimension_entity] -d_r [dimension_relation] --best
 ```
 
 ## Training from Scratch
