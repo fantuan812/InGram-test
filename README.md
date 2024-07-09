@@ -69,5 +69,6 @@ The list of arguments of `train.py`:
 - `--best`: use the best checkpoints 
 - `--no_write`: don't save the checkpoints (only used for train.py)
 - `--client_num`: client number
-- `--single`: use Independent checkpoints
+- `--single`: use Independent checkpoints (only used for multitest.py)
+
 # InGram
