@@ -14,7 +14,7 @@ from my_parser import parse
 import os
 # 设置多线程和随机种子以保证结果的可复现性
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 # OMP_NUM_THREADS = 8
 seed = 0
 torch.manual_seed(seed)
@@ -97,7 +97,7 @@ for i in range(args.client_num):
 		sup = torch.tensor(sup).cuda()
 
 		# 前向传播
-		emb_ent, emb_rel = my_model( msg, relation_triplets)
+		emb_ent, emb_rel = my_model(msg, relation_triplets)
 		pos_scores = my_model.score(emb_ent, emb_rel, msg)
 		neg_scores = my_model.score(emb_ent, emb_rel, generate_neg(msg, train.num_ent, num_neg = num_neg)) #  generate_neg生成负例三元组
 

@@ -145,7 +145,7 @@ class InGramRelationLayer(nn.Module):
         # print('concat_mat',concat_mat)
         # 计算注意力值
         attn_val_raw = (self.act(self.attn_proj(concat_mat).view(-1, self.num_head, self.dim_hid_rel)) * \
-                        self.attn_vec).sum(dim = -1, keepdim = True) + self.attn_bin[relation_triplets[...,2]]
+                        self.attn_vec).sum(dim = -1, keepdim = True) 
         # print('attn_val_raw',attn_val_raw)
         # 散列索引准备用于scatter操作
         scatter_idx = head_idxs.unsqueeze(dim = -1).repeat(1, self.num_head).unsqueeze(dim = -1)

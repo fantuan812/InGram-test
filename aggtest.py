@@ -74,13 +74,15 @@ class Server:
                 averaged_weights = torch.div(accumulated_weights, rel_size).clone()
                 self.relation_layer_weights[name] = averaged_weights
             elif "layers_ent" in name :
-                accumulated_weights = torch.sum(torch.stack([
-                    torch.mul(client.relation_weights[name], client.num_ent) for client in clients
-                ]), dim=0)
-                averaged_weights = torch.div(accumulated_weights, ent_size).clone()
+                # 加权平均
+                # accumulated_weights = torch.sum(torch.stack([
+                #     torch.mul(client.relation_weights[name], client.num_ent) for client in clients
+                # ]), dim=0)
+                # averaged_weights = torch.div(accumulated_weights, ent_size).clone()
+                # self.relation_layer_weights[name] = averaged_weights
+                # 简单平均
+                averaged_weights=torch.mean(torch.stack([cw[name] for cw in collected_weights]), dim=0)
                 self.relation_layer_weights[name] = averaged_weights
-            #     averaged_weights=torch.mean(torch.stack([cw[name] for cw in collected_weights]), dim=0)
-            #     self.relation_layer_weights[name] = averaged_weights
     def distribute_weights(self, clients):
         # 分发权重给所有客户端
         for client in clients:
