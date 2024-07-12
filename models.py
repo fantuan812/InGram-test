@@ -231,7 +231,7 @@ class InGram(nn.Module):
         # 初始化所有权重和偏置
         self.param_init()
 
-        self.drop = torch.nn.Dropout(0.2)
+        self.drop = torch.nn.Dropout(0.5)
 
 
     
@@ -264,27 +264,29 @@ class InGram(nn.Module):
                 nn.init.zeros_(self.res_proj_rel[layer_idx].bias)
             
 
-    def forward(self, triplets, relation_triplets):
+    def forward(self,emb_ent,emb_rel, triplets, relation_triplets):
         # 通过初始投影层传递输入嵌入
         # layer_emb_ent = self.ent_proj1(self.init_emb_ent)
         # layer_emb_rel = self.rel_proj1(self.init_emb_rel)
         layer_emb_ent = self.init_emb_ent
         layer_emb_rel = self.init_emb_rel
+
+        # layer_emb_ent = emb_ent
+        # layer_emb_rel = emb_rel
         # layer_emb_ent = self.ent_proj1(emb_ent)
         # layer_emb_rel = self.rel_proj1(emb_rel)
         # 处理关系嵌入通过关系层，包括跳跃连接和激活
         for layer_idx, layer in enumerate(self.layers_rel):
             layer_emb_rel = layer(layer_emb_rel, relation_triplets) + \
                             self.res_proj_rel[layer_idx](layer_emb_rel)
-            # layer_emb_rel = self.drop(layer_emb_rel)
             layer_emb_rel = self.act(layer_emb_rel)
+        # layer_emb_rel = self.drop(layer_emb_rel)
         # 处理实体嵌入通过实体层，包括跳跃连接和激活
         for layer_idx, layer in enumerate(self.layers_ent):
             layer_emb_ent = layer(layer_emb_ent, layer_emb_rel, triplets) + \
                             self.res_proj_ent[layer_idx](layer_emb_ent)
-            # layer_emb_ent = self.drop(layer_emb_ent)
             layer_emb_ent = self.act(layer_emb_ent)
-            
+        # layer_emb_ent = self.drop(layer_emb_ent)
 
         # 返回最终变换的实体和关系嵌入
         # layer_emb_ent=self.ent_proj2(layer_emb_ent)
@@ -298,9 +300,9 @@ class InGram(nn.Module):
         tail_idxs = triplets[..., 2]
         head_embs = emb_ent[head_idxs]
         tail_embs = emb_ent[tail_idxs]
-        # rel_embs = self.rel_proj(emb_rel[rel_idxs])
+        rel_embs = self.rel_proj(emb_rel[rel_idxs])
         # TransE
-        rel_embs = emb_rel[rel_idxs]
+        # rel_embs = emb_rel[rel_idxs]
         # score = (head_embs + rel_embs) - tail_embs
         # score = self.gamma.item() - torch.norm(score, p=1, dim=-1)
         # Dismult

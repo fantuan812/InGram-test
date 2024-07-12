@@ -46,10 +46,10 @@ def evaluate(my_model, target, epoch, init_emb_ent, init_emb_rel, relation_tripl
 
 
     
-def evaluates(my_model, target, epoch, init_emb_ent, init_emb_rel, relation_triplets):
+def evaluates(my_model, target, msg,epoch, init_emb_ent, init_emb_rel, relation_triplets):
     with torch.no_grad():
         my_model.eval()
-        msg = torch.tensor(target.msg_triplets).cuda()
+        # msg = torch.tensor(target.msg_triplets).cuda()
         sup = torch.tensor(target.sup_triplets).cuda()
         emb_ent, emb_rel = my_model( msg, relation_triplets)
         head_ranks = []
@@ -130,13 +130,13 @@ def evaluatemulti(my_model, target, epoch, init_emb_ent, init_emb_rel, relation_
         print(f"Hits@1: {hit1:.3f}")
         return ranks, mrr
 
-def evaluateg(my_model, target, epoch, init_emb_ent, init_emb_rel, relation_triplets):
+def evaluateg(my_model, target, msg,epoch, init_emb_ent, init_emb_rel, relation_triplets):
     with torch.no_grad():
         my_model.eval()
-        msg = torch.tensor(target.msg_triplets).cuda()
+        # msg = torch.tensor(target.msg_triplets).cuda()
         sup = torch.tensor(target.sup_triplets).cuda()
 
-        emb_ent, emb_rel = my_model(init_emb_ent, init_emb_rel, msg, relation_triplets)
+        emb_ent, emb_rel = my_model( init_emb_ent, init_emb_rel,msg, relation_triplets)
 
         head_ranks = []
         tail_ranks = []

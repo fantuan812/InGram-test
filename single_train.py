@@ -118,7 +118,7 @@ for i in range(args.client_num):
 			val_init_emb_ent, val_init_emb_rel, val_relation_triplets = initialize(valid, valid.msg_triplets, \
 																					d_e, d_r, B)
 
-			mrr = evaluates(my_model, valid, epoch, val_init_emb_ent, val_init_emb_rel, val_relation_triplets)
+			mrr = evaluates(my_model, valid, msg,epoch, val_init_emb_ent, val_init_emb_rel, val_relation_triplets)
 
 			# 如果允许写入，保存模型状态
 			if not args.no_write:

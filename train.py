@@ -1,5 +1,5 @@
 from relgraph import generate_relation_triplets
-from dataset import TrainData, TestNewData
+from dataset import TrainData, TestNewData,TestData
 from tqdm import tqdm
 import random
 from models import InGram
@@ -84,7 +84,7 @@ optimizer = torch.optim.Adam(my_model.parameters(), lr = args.learning_rate)
 
 # init_emb_ent, init_emb_rel, relation_triplets = initialize(train,msg, d_e, d_r, B)
 # emb_ent, emb_rel, relation_triplets = initialize(train,msg, d_e, d_r, B)
-name='FB15k 128'
+name='C3FL_1 In 0.5msg'
 total_loss = 0
 # writer = SummaryWriter(log_dir='./logs/' + time.strftime('%y-%m-%d_%H.%M', time.localtime()))
 # writer = {
@@ -113,15 +113,16 @@ while(epoch<maxepoch):
 	# print("emb_ent:",emb_ent)
 	# print("emb_rel:",emb_rel)
 	# 前向传播
-	msg, sup = train.split_transductive(1) # 随机分割数据 msg训练数据 
+	msg, sup = train.split_transductive(0.5) # 随机分割数据 msg训练数据 
 	# 初始化实体和关系的嵌入向量
 	init_emb_ent, init_emb_rel, relation_triplets = initialize(train,msg, d_e, d_r, B)
 	msg = torch.tensor(msg).cuda()
+	sup = torch.tensor(sup).cuda()
 	emb_ent, emb_rel = my_model(init_emb_ent, init_emb_rel, msg, relation_triplets)
 	# print('initemb_ent',emb_ent)
 	# emb_ent, emb_rel = my_model(emb_ent, emb_rel, msg, relation_triplets)
-	pos_scores = my_model.score(emb_ent, emb_rel, msg)
-	neg_scores = my_model.score(emb_ent, emb_rel, generate_neg(msg, train.num_ent, num_neg = num_neg)) #  generate_neg生成负例三元组
+	pos_scores = my_model.score(emb_ent, emb_rel, sup)
+	neg_scores = my_model.score(emb_ent, emb_rel, generate_neg(sup, train.num_ent, num_neg = num_neg)) #  generate_neg生成负例三元组
 
 	# 计算损失并反向传播
 	loss = loss_fn(pos_scores.repeat(num_neg), neg_scores, torch.ones_like(neg_scores))
@@ -144,7 +145,12 @@ while(epoch<maxepoch):
 		val_init_emb_ent, val_init_emb_rel, val_relation_triplets = initialize(valid, valid.msg_triplets, \
 																				d_e, d_r, B)
 		
-		mr, mrr, hit10, hit3, hit1=evaluateg(my_model, valid, epoch, val_init_emb_ent, val_init_emb_rel, val_relation_triplets)
+		msg, sup = train.split_transductive(1) # 随机分割数据 msg训练数据 
+		# 初始化实体和关系的嵌入向量
+		init_emb_ent, init_emb_rel, relation_triplets = initialize(train,msg, d_e, d_r, B)
+		msg = torch.tensor(msg).cuda()
+		msg = torch.tensor(sup).cuda()
+		mr, mrr, hit10, hit3, hit1=evaluateg(my_model, valid, msg,epoch, init_emb_ent, init_emb_rel,relation_triplets)
 		writer['valid'].add_scalar("mr", mr, epoch)
 		writer['valid'].add_scalar("mrr", mrr, epoch)
 		writer['valid'].add_scalar("hit10", hit10, epoch)
